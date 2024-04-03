@@ -1,3 +1,4 @@
+""" In one of our model variants KV-PLM, we directly take the tokenizer of Sci-BERT to tokenize SMILES strings, regarding them exactly the same as general text."""
 from transformers import BertTokenizer
 from tokenization import SmilesTokenizer
 import pickle
@@ -72,8 +73,8 @@ for ind in range(a, b):
 rec_cor.append(cnt)
 #print(cnt)
 np.save('sci/'+fn+'_cor.npy', rec_cor)
-np.save('sci/'+fn+'_tokdes.npy', alltokdes)
+np.save('sci/'+fn+'_tokdes.npy', alltokdes)  # des: tokenized language description (len < 64)
 np.save('sci/'+fn+'_attdes.npy', allattdes)
-np.save('sci/'+fn+'_toksmi.npy', alltoksmi)
+np.save('sci/'+fn+'_toksmi.npy', alltoksmi)  # smi: tokenized SMILES string (len < 32)
 np.save('sci/'+fn+'_attsmi.npy', allattsmi)
 

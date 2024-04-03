@@ -1,19 +1,19 @@
 
-# chemprot RE data preprocessing
+# # chemprot RE data preprocessing
 
-cd ../chemprot/
-mkdir predata
+# cd ../chemprot/
+# mkdir predata
 
-python preprocess.py train
-python preprocess.py dev
-python preprocess.py test
+# python preprocess.py train
+# python preprocess.py dev
+# python preprocess.py test
 
-# BC5CDR NER data preprocessing
-cd ../NER/
+# # BC5CDR NER data preprocessing
+# cd ../NER/
 
-python preprocess.py train
-python preprocess.py dev
-python preprocess.py test
+# python preprocess.py train
+# python preprocess.py dev
+# python preprocess.py test
 
 # Retrieval data preprocessing
 
@@ -23,6 +23,7 @@ python preprocess.py train
 python preprocess.py dev
 python preprocess.py test
 
+mkdir sci
 python sci_preprocess.py train
 python sci_preprocess.py dev
 python sci_preprocess.py test

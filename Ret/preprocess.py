@@ -1,3 +1,4 @@
+""" In the other variant KV-PLM*, inspired by the SPE-based generative models, we apply BPE to SMILES strings to better control the tokenization of SMILES strings."""
 from transformers import BertTokenizer
 from tokenization import SmilesTokenizer
 import pickle
@@ -12,11 +13,21 @@ f.close()
 
 fn = sys.argv[-1]
 #cor = pickle.load(open('predata_sent/cor.pkl', 'rb'))
-sm = pickle.load(open('data/align_sub_all.pkl', 'rb'))
+sm = pickle.load(open('data/align_sub_all.pkl', 'rb'))  # dict, key: line number of 'align_des_filt3.txt', value: tokenized SMILES
 #smsyn = pickle.load(open('../../dataset/PubChem/CP-name-all.pkl', 'rb'))
-smsyn = pickle.load(open('data/align_smdic.pkl', 'rb'))
-synid = pickle.load(open('data/synid_dic.pkl', 'rb'))
+smsyn = pickle.load(open('data/align_smdic.pkl', 'rb'))  # dict, key: PubChem id, value: SMILES
+synid = pickle.load(open('data/synid_dic.pkl', 'rb')) # dict, key: line number of 'align_des_filt3.txt', value: PubChem id.
 import pdb
+
+# Verify the data format.
+# assert list(sm.keys())[0] == 0
+# print(sm[0])
+# # a = tokenizer0(list(smsyn.values())[0], padding=True, truncation=True, max_length=32)['input_ids']
+# print(smsyn[synid[0]])
+# print(len(smsyn[synid[0]]))
+# a = tokenizer0(smsyn[synid[0]], padding=False, truncation=True, max_length=32)['input_ids']
+# print(a)
+# print(len(a))
 
 alltokdes = []
 allattdes = []
@@ -84,9 +95,9 @@ for ind in range(a, b):
 rec_cor.append(cnt)
 #print(cnt)
 np.save('sent/'+fn+'_cor.npy', rec_cor)
-np.save('sent/'+fn+'_tokdes.npy', alltokdes)
+np.save('sent/'+fn+'_tokdes.npy', alltokdes)  # des: tokenized language description (len < 64)
 np.save('sent/'+fn+'_attdes.npy', allattdes)
-np.save('sent/'+fn+'_toksmi.npy', alltoksmi)
+np.save('sent/'+fn+'_toksmi.npy', alltoksmi)  # smi: tokenized SMILES by BPE tokenizer (len < 32)
 np.save('sent/'+fn+'_attsmi.npy', allattsmi)
-np.save('sent/'+fn+'_toksyn.npy', alltoksyn)
+np.save('sent/'+fn+'_toksyn.npy', alltoksyn)  # syn: tokenized SMILES by scibert tokenizer (len < 64)
 np.save('sent/'+fn+'_attsyn.npy', allattsyn)

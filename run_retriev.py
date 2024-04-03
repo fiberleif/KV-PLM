@@ -54,10 +54,12 @@ class Align_dataset(Dataset):
         self.attdes = np.load(pth+'_attdes.npy')
         self.iftest = iftest
         if iftest>=2:
+            # Both self.tokdes and self.toksmi are tokenized SMILES.
             self.toksmi = self.tokdes
             self.attsmi = self.attdes
             self.cor = [0]
         else:
+            # Different modalities.
             self.toksmi = np.load(pth+'_toksmi.npy')
             self.attsmi = np.load(pth+'_attsmi.npy')
             self.cor = np.load(pth+'_cor.npy')
@@ -168,6 +170,7 @@ def Eval(model, dataloader, iftest=0):
     model.eval()
     with torch.no_grad():
         acc = 0
+        reverse_acc = 0
         allcnt = 0
         allout = None
         alllab = None
@@ -179,8 +182,13 @@ def Eval(model, dataloader, iftest=0):
             logits_smi = model(toksmi.cuda(), attsmi.cuda())
             #scores = logits_smi.mm(logits_des.t())
             scores = torch.cosine_similarity(logits_smi.unsqueeze(1).expand(logits_smi.shape[0], logits_smi.shape[0], logits_smi.shape[1]), logits_des.unsqueeze(0).expand(logits_des.shape[0], logits_des.shape[0], logits_des.shape[1]), dim=-1)
-            argm = torch.argmax(scores, axis=1)#1
+            # print("score shape: ", scores.shape) # torch.Size([64, 64])
+            argm = torch.argmax(scores, axis=1)  # obtain the maximum value of each row/molecular SMILES
             acc += sum((argm==torch.arange(argm.shape[0]).cuda()).int()).item()
+
+            reverse_argm = torch.argmax(scores, axis=0)  # obtain the maximum value of each column/language description
+            reverse_acc += sum((reverse_argm==torch.arange(reverse_argm.shape[0]).cuda()).int()).item()
+
             allcnt += argm.shape[0]
             if iftest>0:
                 if des is None:
@@ -196,7 +204,8 @@ def Eval(model, dataloader, iftest=0):
         np.save('Ret/output_sent/test_des.npy', des.cpu())
     elif iftest==3:
         np.save('Ret/output_sent/filt_des.npy', des.cpu())
-    print(acc/allcnt)       
+    print("acc: ", acc/allcnt)
+    print("reverse acc: ", reverse_acc/allcnt)
     return acc/allcnt
 
 def main(args):
@@ -238,7 +247,7 @@ def main(args):
     tag = True
     best_acc = 0
     if args.iftest>0:
-        model.load_state_dict(torch.load(args.output))
+        model.load_state_dict(torch.load(args.output))  # load the model from the output file
         acc = Eval(model,test_dataloader, iftest=args.iftest)
         return
     for epoch in range(args.epoch):
@@ -290,7 +299,7 @@ def parse_args(parser=argparse.ArgumentParser()):
     parser.add_argument("--config_file", default='bert_base_config.json', type=str,)
     parser.add_argument("--init_checkpoint", default=None, type=str,)
     parser.add_argument("--tok", default=0, type=int,)
-    parser.add_argument("--iftest", default=0, type=int,)
+    parser.add_argument("--iftest", default=0, type=int,)  # iftest=0 means train+eval
     parser.add_argument("--weight_decay", default=0, type=float,)
     parser.add_argument("--lr", default=5e-5, type=float,)#4
     parser.add_argument("--warmup", default=0.2, type=float,)
