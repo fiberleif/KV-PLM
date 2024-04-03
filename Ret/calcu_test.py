@@ -51,7 +51,8 @@ for i in range(3000):
         if idx[-1-j]==i:
             rec_syn.append(j)
             break
-print(sum( (np.array(rec_syn)<1).astype(int) ))
-print(sum( (np.array(rec_syn)<5).astype(int) ))
-print(sum( (np.array(rec_syn)<10).astype(int) ))
-print(sum( (np.array(rec_syn)<20).astype(int) ))
+print("Size of rec_syn: ", len(rec_syn))
+print(sum( (np.array(rec_syn)<1).astype(int) ) / float(len(rec_syn)))
+print(sum( (np.array(rec_syn)<5).astype(int) ) / float(len(rec_syn)))
+print(sum( (np.array(rec_syn)<10).astype(int) ) / float(len(rec_syn)))
+print(sum( (np.array(rec_syn)<20).astype(int) ) / float(len(rec_syn)))
